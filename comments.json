@@ -1,0 +1,30 @@
+[
+  {
+    "commentID": "1",
+    "content": "Sdasndkasd",
+    "postID": "1",
+    "date": "Now",
+    "owner": "1"
+  },
+  {
+    "commentID": "2",
+    "content": "New Comment",
+    "postID": "1",
+    "date": "Now",
+    "owner": "1"
+  },
+  {
+    "commentID": "3",
+    "content": "Comment for Post 2",
+    "postID": "2",
+    "date": "Now",
+    "owner": "1"
+  },
+  {
+    "commentID": "4",
+    "owner": "2",
+    "postID": "2",
+    "date": "2/12/2024",
+    "content": "This is new comment"
+  }
+]
