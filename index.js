@@ -1,6 +1,7 @@
 const express = require("express");
 const port = 1000;
 const myServer = express();
+const { createNetflixEndPoints } = require("./mongodb");
 
 const { getPostData } = require("./posts");
 const { getCommentsData } = require("./comment");
@@ -10,6 +11,7 @@ myServer.get("/", (request, response) => {
   response.send("Hello Express Server");
 });
 
+createNetflixEndPoints(myServer);
 getCommentsData(myServer);
 require("./users")(myServer);
 getPostData(myServer);
