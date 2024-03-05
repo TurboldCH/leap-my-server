@@ -1,6 +1,5 @@
 const { response } = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-const uri = "";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -91,10 +90,32 @@ const createNetflixEndPoints = (myServer) => {
       type,
       tomatoes,
     } = body;
+    const params = {
+      plot: plot,
+      runtime: runtime,
+      cast: cast,
+      num_mflix_comments: num_mflix_comments,
+      fullplot: fullplot,
+      languages: languages,
+      released: released,
+      directors: directors,
+      lastupdated: lastupdated,
+      imdb: imdb,
+      countries: countries,
+      tomatoes: tomatoes,
+      year: year,
+      genre: genre,
+      title: title,
+      type: type,
+      writers: writers,
+    };
+    let missingFields = Object.keys(params).filter((value) => {
+      return !Object.keys(body).includes(value);
+    });
     try {
       const movieCollection = await getCollection("sample_mflix", "movies");
-      if ((genre && title && year && type && writers) == null) {
-        throw new TypeError("Required field is missing!");
+      if (missingFields.length > 0) {
+        throw new Error(`${missingFields.join(", ")} - fields are missing`);
       } else {
         movieCollection.insertOne({
           plot: plot,
@@ -110,7 +131,7 @@ const createNetflixEndPoints = (myServer) => {
           countries: countries,
           tomatoes: tomatoes,
           year: year,
-          genres: genre,
+          genre: genre,
           title: title,
           type: type,
           writers: writers,
@@ -140,4 +161,4 @@ const createNetflixEndPoints = (myServer) => {
   });
 };
 
-module.exports = { createNetflixEndPoints };
+module.exports = { createNetflixEndPoints, client };
