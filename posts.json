@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "text": "This is very nice post from posts",
+    "likes": 10,
+    "createdAt": "Now",
+    "owner": "1"
+  },
+  {
+    "id": "2",
+    "text": "This is very nice post from posts",
+    "likes": 20,
+    "createdAt": "Now",
+    "owner": "1"
+  },
+  {
+    "id": "3",
+    "text": "This is very nice post from posts",
+    "likes": 30,
+    "createdAt": "Now",
+    "owner": "2"
+  },
+  {
+    "id": "4",
+    "text": "New post Updated",
+    "likes": 105,
+    "createdAt": "1/29/2024",
+    "owner": "2"
+  }
+]
