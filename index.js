@@ -264,9 +264,6 @@ myServer.post("/reset-password/:userID", async (request, response) => {
     response.status(401).json("Invalid Token");
   }
 });
-myServer.get("/", (request, response) => {
-  response.send("Hello Express Server");
-});
 
 createEndPoints(myServer);
 myServer.listen(port, () => {
