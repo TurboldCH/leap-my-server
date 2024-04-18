@@ -267,6 +267,6 @@ myServer.post("/reset-password/:userID", async (request, response) => {
 
 createEndPoints(myServer);
 myServer.listen(port, () => {
-  console.log("My server running");
+  console.log("My server running on port", port);
 });
 module.exports = { JWT_SECRET, ALGORITHM };
