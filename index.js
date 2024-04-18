@@ -13,7 +13,6 @@ const ALGORITHM = process.env.ALGORITHM;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 const EMAIL = process.env.EMAIL;
 const HOST = process.env.HOST;
-const PORT = process.env.PORT;
 myServer.use(express.json());
 myServer.use(cors());
 const { client } = require("./mongodb");
@@ -22,14 +21,16 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   host: HOST,
-  port: PORT,
+  port: 465,
   secure: true,
   auth: {
     user: EMAIL,
     pass: EMAIL_PASS,
   },
 });
-
+myServer.get("/", (req, res) => {
+  res.status(200).json("Working");
+});
 myServer.post("/forgot-password-email", async (req, res) => {
   await client.connect();
   const { email } = req.body;
@@ -93,9 +94,6 @@ myServer.post("/reset-password-email", async (req, res) => {
     response.status(401).json("Invalid Token");
   }
 });
-myServer.get("/", (req, res) => {
-  res.status(200).json("Working");
-});
 myServer.get("/getToken", (request, response) => {
   response.send(
     jwt.sign({ email: "testing@gmail.com" }, JWT_SECRET, {
@@ -112,7 +110,6 @@ myServer.get(
     res.status(200);
   }
 );
-
 myServer.post("/register", async (request, response) => {
   const { email, password } = request.body;
   if (!email || !password) {
