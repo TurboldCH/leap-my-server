@@ -79,11 +79,42 @@ const createEndPoints = (myServer) => {
     }
   );
   myServer.get(
+    "/products/getItem/:id",
+    expressjwt({ secret: JWT_SECRET, algorithms: [ALGORITHM] }),
+    async (request, response) => {
+      await client.connect();
+      const itemID = request.params.id;
+      if (!itemID) {
+        response.status(401).send("ItemID is undefined");
+        return;
+      }
+      const db = await client.db("ecommerceProducts");
+      const collectionNames = await db.listCollections().toArray();
+      for (const { name: collectionName } of collectionNames) {
+        const collection = await db.collection(collectionName);
+        if (!itemID) {
+          continue;
+        }
+        const findDocument = await collection.findOne({
+          _id: new ObjectId(String(itemID)),
+        });
+        if (findDocument) {
+          // Document found, return it
+          return response.json(findDocument);
+        }
+      }
+    }
+  );
+  myServer.get(
     "/products/:category",
     expressjwt({ secret: JWT_SECRET, algorithms: [ALGORITHM] }),
     async (request, response) => {
       await client.connect();
       const category = request.params.category;
+      if (!category) {
+        response.status(401).send("Category is undefined");
+        return;
+      }
       const collection = await getCollection("ecommerceProducts", category);
       const findCollection = await collection.find().toArray();
       response.json(findCollection);
@@ -131,6 +162,30 @@ const createEndPoints = (myServer) => {
         }
       } catch (error) {
         response.json("Document doesn't exist");
+      }
+    }
+  );
+  myServer.delete(
+    "/products/:id",
+    expressjwt({ secret: JWT_SECRET, algorithms: [ALGORITHM] }),
+    async (request, response) => {
+      await client.connect();
+      const itemID = request.params.id;
+      const db = await client.db("ecommerceProducts");
+      const collectionNames = await db.listCollections().toArray();
+      for (const { name: collectionName } of collectionNames) {
+        const collection = await db.collection(collectionName);
+        const findDocument = await collection.findOne({
+          _id: new ObjectId(String(itemID)),
+        });
+        if (findDocument) {
+          const deletedItem = await collection.deleteMany({
+            _id: new ObjectId(String(itemID)),
+          });
+          response.json({
+            ItemDeleted: deletedItem,
+          });
+        }
       }
     }
   );

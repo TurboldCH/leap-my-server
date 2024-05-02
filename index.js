@@ -107,7 +107,7 @@ myServer.get(
   expressjwt({ secret: JWT_SECRET, algorithms: [ALGORITHM] }),
   (req, res) => {
     // if (!req.auth.admin) return res.sendStatus(401);
-    res.status(200);
+    res.sendStatus(200);
   }
 );
 myServer.post("/register", async (request, response) => {
@@ -178,7 +178,8 @@ myServer.post("/login", async (request, response) => {
             algorithm: ALGORITHM,
           }
         );
-        response.status(200).json({ token, refreshToken });
+        const userEmail = findDocument.email;
+        response.status(200).json({ token, refreshToken, userEmail });
       }
     } catch (error) {
       response.status(500).json(error.message);
@@ -205,6 +206,7 @@ myServer.post("/refresh", async (request, response) => {
       JWT_SECRET,
       { algorithm: ALGORITHM, expiresIn: "1h" }
     );
+    const userEmail = findDocument.email;
     response.status(200).json(accessToken);
   });
 });
