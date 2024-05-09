@@ -70,9 +70,14 @@ const createEndPoints = (myServer) => {
         .toArray();
       const allData = [];
       const allPromises = collections.map(async (value) => {
-        const collection = await getCollection("ecommerceProducts", value.name);
-        const findCollection = await collection.find().toArray();
-        allData.push(...findCollection);
+        if (value.name !== "users" && value.name !== "tokens") {
+          const collection = await getCollection(
+            "ecommerceProducts",
+            value.name
+          );
+          const findCollection = await collection.find().toArray();
+          allData.push(...findCollection);
+        }
       });
       await Promise.all(allPromises);
       response.json(allData);
@@ -106,6 +111,23 @@ const createEndPoints = (myServer) => {
     }
   );
   myServer.get(
+    "/products/categories",
+    expressjwt({ secret: JWT_SECRET, algorithms: [ALGORITHM] }),
+    async (request, response) => {
+      await client.connect();
+      const collections = await client
+        .db("ecommerceProducts")
+        .listCollections()
+        .toArray();
+      const allCategories = [];
+      collections.map(async (category) => {
+        if (category.name !== "users" && category.name !== "tokens")
+          allCategories.push(category.name);
+      });
+      response.json(allCategories);
+    }
+  );
+  myServer.get(
     "/products/:category",
     expressjwt({ secret: JWT_SECRET, algorithms: [ALGORITHM] }),
     async (request, response) => {
@@ -134,6 +156,8 @@ const createEndPoints = (myServer) => {
         });
         if (findDocument) {
           response.json(findDocument);
+        } else {
+          response.json("Document doesn't exist");
         }
       } catch (error) {
         response.json("Document Doesn't Exist");
@@ -159,6 +183,8 @@ const createEndPoints = (myServer) => {
           response.json({
             ItemDeleted: deletedItem,
           });
+        } else {
+          response.json("Document doesn't exist");
         }
       } catch (error) {
         response.json("Document doesn't exist");
@@ -260,22 +286,29 @@ const createEndPoints = (myServer) => {
       const body = request.body;
       const valuesToUpdate = Object.keys(body);
       const collection = await getCollection("ecommerceProducts", category);
-      let updatedDoc;
-      try {
-        await valuesToUpdate.map(async (value) => {
-          const filter = { _id: new ObjectId(String(itemID)) };
-          const operation = { $set: {} };
-          operation.$set[value] = body[value];
-          const updated = await collection.updateOne(filter, operation);
-          updatedDoc = {
-            UpdatedDocument: await collection.findOne({
-              _id: new ObjectId(String(itemID)),
-            }),
-          };
-          response.json(updatedDoc);
-        });
-      } catch (er) {
-        response.json(er.message);
+      const findDocument = await collection.findOne({
+        _id: new ObjectId(String(itemID)),
+      });
+      if (!findDocument) {
+        response.json("Document doesn't exist");
+      } else {
+        let updatedDoc;
+        try {
+          await valuesToUpdate.map(async (value) => {
+            const filter = { _id: new ObjectId(String(itemID)) };
+            const operation = { $set: {} };
+            operation.$set[value] = body[value];
+            const updated = await collection.updateOne(filter, operation);
+            updatedDoc = {
+              UpdatedDocument: await collection.findOne({
+                _id: new ObjectId(String(itemID)),
+              }),
+            };
+            response.json(updatedDoc);
+          });
+        } catch (er) {
+          response.json(er.message);
+        }
       }
     }
   );

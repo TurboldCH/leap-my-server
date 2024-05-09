@@ -127,14 +127,14 @@ myServer.post("/register", async (request, response) => {
         response.status(401).json({ message: "User Already Exists" });
       } else {
         const hashPass = await bcrypt.hash(password, 10);
-        collection.insertOne({ email: email, password: hashPass });
         const token = jwt.sign({ email: email }, JWT_SECRET, {
           algorithm: "HS256",
-          expiresIn: "1hs",
+          expiresIn: "1h",
         });
         const refreshToken = jwt.sign({ email: email }, JWT_SECRET, {
           algorithm: ALGORITHM,
         });
+        collection.insertOne({ email: email, password: hashPass });
         response.status(200).json({ token, refreshToken });
       }
     } catch (error) {
